@@ -5,13 +5,13 @@ from .utils import RandomStringTokenGenerator
 from django.template.loader import render_to_string
 
 def send_register_mail(instance, domain, assets_image_path, UserTokenSerializer, template):
-    from .models.default_models import UserToken
+    from .models import UserToken
     rand = RandomStringTokenGenerator()
     token = rand.generate_unique_token(model=UserToken, field="key")
     first_name = instance.first_name if (len(instance.first_name) >= 1) else "User"
     message = render_to_string(template, 
     {'username': first_name, 'domain': domain, 'token': token, 'identifier': instance.id, 'url': assets_image_path})
-    mail = instance.send_mail(subject="Welcome to Microstay - Registration Confirmation", message=message)
+    mail = instance.send_mail(subject=f"Welcome to {settings.PROJECT_NAME} - Registration Confirmation", message=message)
     if(mail == "success"):
         data = {"user" : instance.id, "key" : token, "key_type" : 0}
         tokenSerializer = UserTokenSerializer(data=data)

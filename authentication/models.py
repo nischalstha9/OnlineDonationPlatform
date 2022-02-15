@@ -1,14 +1,16 @@
+from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from datetime import timedelta, datetime
-from django.conf import settings
-from authentication.constants import DEFAULT_AVATAR
+from .managers import AllUserManager, CustomUserManager, CustomerManager
+from .constants import DEFAULT_AVATAR
+from .tasks import send_mail_asynchron
+from PIL import Image
 
-from authentication.managers import CustomUserManager, CustomerManager, AllUserManager, HotelUserManager
-from ..tasks import send_mail_asynchron
+# Create your models here.
 
 GENDER_CHOICES = (
     ('M', 'Male'),
@@ -17,12 +19,12 @@ GENDER_CHOICES = (
     ('N', "No Information")
 )
 
-
 ROLE_CHOICES = (
     (0, 'Admin'),
-    (1, 'HotelUser'),
+    (1, 'ShopUser'),
     (2, 'Customer'),
 )
+
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):    
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
@@ -41,12 +43,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    email_verified = models.BooleanField(default=False, verbose_name='email_activated')
+    email_verified = models.BooleanField(default=False, verbose_name='Email Verified')
     date_joined = models.DateTimeField(default=timezone.now)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=1, default=GENDER_CHOICES[3][0])
     phone = models.CharField(max_length=15, null=True, blank=True)
     role = models.IntegerField(blank=True, default=ROLE_CHOICES[1][0], choices=ROLE_CHOICES)
-    avatar = models.ImageField(upload_to='admin/avatar/', default=DEFAULT_AVATAR, blank=True)
+    avatar = models.ImageField(upload_to='profile/avatar/', default=DEFAULT_AVATAR, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -78,6 +80,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             self.is_superuser = False
         super(CustomUser,self).save(*args, **kwargs)
 
+        img = Image.open(self.avatar.path)
+
+        if img.height > 600 or img.width > 600:
+            output_size = (600, 600)
+            img.thumbnail(output_size)
+            img.save(self.avatar.path)
+
     def delete(self):
         img_file = self.avatar
         if (not img_file.name == DEFAULT_AVATAR):
@@ -88,9 +97,8 @@ class Customer(CustomUser):
     objects = CustomerManager()
     dob = models.DateField(blank=True, null=True)
 
-
     class Meta:
-        verbose_name_plural = "customers"
+        verbose_name_plural = "Users"
 
     def save(self, *args, **kwargs):
         self.role = 2

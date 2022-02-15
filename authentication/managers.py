@@ -89,13 +89,3 @@ class CustomerManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().filter(role=2)
-
-
-class HotelUserManager(models.Manager):
-    """
-    Custom user model manager where email is the unique identifiers
-    for authentication instead of usernames.
-    """
-
-    def get_queryset(self):
-        return super().get_queryset().filter(role=1)

@@ -3,6 +3,9 @@ import binascii
 import random
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
+
+mobile_num_regex_validator = RegexValidator(regex="^[0-9]{9,15}$", message="Entered mobile number isn't in a right format!")
 
 class BaseTokenGenerator:
     """
