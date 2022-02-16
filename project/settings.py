@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # 'django.contrib.sites',
     'django_filters',
     'rest_framework',
+    'rest_framework_swagger',
     'authentication',
     'donation',
 ]
@@ -156,6 +157,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer"
         ),
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 }
 
@@ -174,7 +176,7 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # SIMPLE JWT
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -198,3 +200,4 @@ CLIENT_URL = os.environ.get('CLIENT_URL')
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'access_token'
 JWT_AUTH_REFRESH_COOKIE = 'refresh_token'
+PROJECT_NAME = "Sharing is Caring"

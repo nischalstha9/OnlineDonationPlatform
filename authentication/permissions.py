@@ -73,8 +73,8 @@ class IsCustomerPermission(permissions.BasePermission):
             return True
         return False
 
-class IsDontationOwnerPermission(permissions.BasePermission):
+class IsDontationOwnerOrReadOnlyPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if is_user_admin:
+        if request.method in permissions.SAFE_METHODS or is_user_admin(request):
             return True
         return obj.doner == request.user

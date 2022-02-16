@@ -111,15 +111,11 @@ class UserView(APIView):
     def get_queryset(self):
         if is_user_admin(self.request):
             return CustomUser.objects.all()
-        elif is_user_shop_user(self.request):
-            return ShopUser.objects.all()
         return Customer.objects.all()
 
     def get_serializer_class(self):
         if is_user_admin(self.request):
             return CustomUserSerializer
-        elif is_user_shop_user(self.request):
-            return ShopUserSerializer
         return CustomerSerializer
     
 
