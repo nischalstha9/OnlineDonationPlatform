@@ -43,9 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     # 'django.contrib.sites',
+    'django_filters',
     'rest_framework',
     'authentication',
+    'donation',
 ]
 # SITE_ID = 1
 

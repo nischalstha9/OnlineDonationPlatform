@@ -1,0 +1,16 @@
+DEBUG=True
+DATABASE_URL=postgres://postgres:admin@localhost:5432/sharing_is_caring
+DATABASE_NAME=sharing_is_caring
+DATABASE_USER=postgres
+DATABASE_PASSWORD=pwd
+SECRET_KEY="*nn)70g*dcxukgu@++!"
+ALLOWED_HOSTS=localhost,127.0.0.1
+ENVIRONMENT="Test"
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_HOST_USER=''
+EMAIL_HOST_PASSWORD=''
+EMAIL_PORT=587
+CLIENT_URL='http://localhost:3000'
+ADMIN_URL='http://localhost:8000'
+CELERY_BROKER_URL='redis://localhost:6379'
+CELERY_RESULT_BACKEND='redis://localhost:6379'

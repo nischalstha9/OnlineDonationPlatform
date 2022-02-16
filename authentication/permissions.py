@@ -56,6 +56,10 @@ class IsAdminPermission(permissions.BasePermission):
             return True
         return False
 
+class ReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.method in permissions.SAFE_METHODS
+
 
 class IsAdminOrShopUserPermission(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -69,14 +73,8 @@ class IsCustomerPermission(permissions.BasePermission):
             return True
         return False
 
-
-class IsAdminOrShopOwnerPermission(permissions.BasePermission):
-    def has_permission(self, request, view):
-        try:
-            slug = view.kwargs.get('shop_slug', None)
-            shop = get_object_or_404(Shop, slug=slug)
-            if request.user.role == 0 or (request.user.role == 1 and request.user.shopuser.shop == shop):
-                return True
-            return False
-        except Exception:
-            return False
+class IsDontationOwnerPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if is_user_admin:
+            return True
+        return obj.doner == request.user
