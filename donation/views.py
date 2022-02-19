@@ -25,7 +25,7 @@ class DonationListCreateAPIView(ListCreateAPIView):
     serializer_class = DonationSerializer
     permission_classes = [IsAuthenticated|ReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['category', 'location', 'active', 'doner']
+    filterset_fields = ['category', 'location', 'active', 'user']
     search_fields = ['title', 'category__name', 'location']
     ordering_fields = ['title', 'category__name', 'location', 'created_at', 'updated_at']
     pagination_classes = [LimitOffsetPagination]
@@ -46,7 +46,7 @@ class DonationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     def get(self, request, pk, format=None):
         obj = self.get_object()
         if not obj.active:
-            if obj.doner != request.user:
+            if obj.user != request.user:
                 return Response({"detail": "You do not have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
         serializer = DonationSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -61,4 +61,4 @@ class MyDonationListView(ListAPIView):
     pagination_classes = [LimitOffsetPagination]
 
     def get_queryset(self):
-        return Donation.objects.filter(doner=self.request.user)
+        return Donation.objects.filter(user=self.request.user)
