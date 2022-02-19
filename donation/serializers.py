@@ -20,6 +20,11 @@ class DonationSerializer(ModelSerializer):
     class Meta:
         model = Donation
         fields = "__all__"
+        extra_kwargs = {
+            "doner":{
+                "required":False
+            }
+        }
 
     def get_category_name(self, obj):
         return obj.category.name
@@ -27,3 +32,7 @@ class DonationSerializer(ModelSerializer):
     def get_doner_name(self, obj):
         doner = obj.doner
         return f"{doner.first_name} {doner.last_name}"
+
+    def validate(self, attrs):
+        attrs['doner'] = self.context.get('view').request.user
+        return super().validate(attrs)

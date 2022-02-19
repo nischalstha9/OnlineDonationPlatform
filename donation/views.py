@@ -2,8 +2,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from donation.models import Category, Donation
-from django.shortcuts import render
-from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from .serializers import CategorySerializer,DonationSerializer
 from authentication.permissions import IsAdminPermission, IsDontationOwnerOrReadOnlyPermission, ReadOnly, is_user_admin
 from django_filters.rest_framework import DjangoFilterBackend
@@ -45,11 +44,11 @@ class DonationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         return Donation.objects.all()
 
     def get(self, request, pk, format=None):
-        object = self.get_object()
-        if not object.active:
-            if object.doner != request.user:
+        obj = self.get_object()
+        if not obj.active:
+            if obj.doner != request.user:
                 return Response({"detail": "You do not have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
-        serializer = DonationSerializer(object)
+        serializer = DonationSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MyDonationListView(ListAPIView):

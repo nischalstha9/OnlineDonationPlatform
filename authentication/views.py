@@ -32,7 +32,7 @@ def get_user_verification(data):
 def set_auth_cookie(resp):
     refresh = resp.data.get('refresh')
     resp.set_cookie(settings.SIMPLE_JWT.get('REFRESH_COOKIE_NAME'), refresh, max_age=settings.SIMPLE_JWT.get('REFRESH_TOKEN_LIFETIME').total_seconds(), samesite=settings.SIMPLE_JWT.get('REFRESH_TOKEN_SAMESITE'), secure=settings.SIMPLE_JWT.get('REFRESH_TOKEN_SECURE'), httponly=settings.SIMPLE_JWT.get('REFRESH_TOKEN_HTTP_ONLY'))
-    resp.data.pop('refresh')
+    # resp.data.pop('refresh')
     return resp
 
 

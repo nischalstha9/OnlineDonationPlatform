@@ -199,6 +199,8 @@ class CustomerSerializer(serializers.ModelSerializer, CommonUserSerializerMixin)
             'role'
             )
         extra_kwargs = {
+            'first_name': {'required': True},
+            'last_name': {'required': True},
             'password': {'write_only': True},
             'email_verified': {'read_only': True},
             'avatar':{'write_only':True},
