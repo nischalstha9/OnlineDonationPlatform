@@ -8,7 +8,7 @@ from django.utils.text import slugify
 
 # Create your models here.
 class Category(models.Model):
-    name = models.CharField(_("Category Name"), max_length=50)
+    name = models.CharField(_("Category Name"), max_length=50, unique=True)
     parent = models.ForeignKey("donation.Category", verbose_name=_("Parent Category"), on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
@@ -26,14 +26,15 @@ class Category(models.Model):
 class Donation(models.Model):
     title = models.CharField(_("Item Name"), max_length=100)
     description = models.TextField(_("Description"), null=False, blank=False)
-    category = models.ForeignKey("donation.Category", verbose_name=_("Category"), on_delete=models.SET_NULL, null=True, blank=False)
+    category = models.ForeignKey("donation.Category", verbose_name=_("Category"), on_delete=models.SET_NULL, null=True, blank=False, related_name='donations' )
     location = models.CharField(_("Location"), max_length=100)
     contact  = models.CharField(validators=[mobile_num_regex_validator], max_length=13)
-    user = models.ForeignKey("authentication.CustomUser", verbose_name=_("Doner User"), on_delete=models.CASCADE)
+    user = models.ForeignKey("authentication.CustomUser", verbose_name=_("Doner User"), on_delete=models.CASCADE, related_name='donations')
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated At"), auto_now=True)
     active = models.BooleanField(_("Is Active"), default=False)
     slug = models.SlugField(_("Slug"), blank=True, null=False)
+    likes = models.ManyToManyField("authentication.CustomUser", verbose_name=_("Likers"))
 
     class Meta:
         verbose_name = _("Donation")
@@ -53,7 +54,7 @@ class Donation(models.Model):
             slug = slugify(self.title)
             qs = Donation.objects.filter(slug = slug)
             if qs.exists():
-                slug = slug + f"-{qs.last.id}"
+                slug = slug + f"-{qs.last().id}"
             self.slug = slug
         super(Donation,self).save(*args, **kwargs)
     

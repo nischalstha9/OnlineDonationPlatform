@@ -77,4 +77,4 @@ class IsDontationOwnerOrReadOnlyPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS or is_user_admin(request):
             return True
-        return obj.doner == request.user
+        return obj.user == request.user

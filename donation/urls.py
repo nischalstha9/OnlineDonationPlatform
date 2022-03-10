@@ -1,9 +1,11 @@
 from django.urls import path
-from .views import CategoryListCreateAPIView, DonationListCreateAPIView, DonationRetrieveUpdateDestroyAPIView, MyDonationListView
+from .views import CategoryListCreateAPIView, DonationLikeToggleView, DonationListCreateAPIView, DonationRetrieveUpdateDestroyAPIView, HomePageMeta, MyDonationListView
 
 urlpatterns = [
     path('category/', CategoryListCreateAPIView.as_view(), name="CategoryListCreateAPIView"),
     path('donation/', DonationListCreateAPIView.as_view(), name="DonationListCreateAPIView"),
-    path('donation/<int:pk>/', DonationRetrieveUpdateDestroyAPIView.as_view(), name="DonationRetrieveUpdateDestroyAPIView"),
-    path('donation/mydonations/', MyDonationListView.as_view(), name="MyDonationListAPIView"),
+    path('donation/<slug:help_slug>/', DonationRetrieveUpdateDestroyAPIView.as_view(), name="DonationRetrieveUpdateDestroyAPIView"),
+    path('donation/<int:donation_id>/like/', DonationLikeToggleView.as_view(), name="DonationLikeToggleView"),
+    path('mydonations/', MyDonationListView.as_view(), name="MyDonationListAPIView"),
+    path('home-meta/', HomePageMeta.as_view(), name="HomepageMeta"),
 ]
