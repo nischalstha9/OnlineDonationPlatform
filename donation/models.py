@@ -22,6 +22,13 @@ class Category(models.Model):
         return ContentType.objects.get_for_model(self.__class__)
 
 
+class DonationLikes(models.Model):
+    donation = models.ForeignKey("donation.Donation", verbose_name=_("Donation"), on_delete=models.CASCADE)
+    user = models.ForeignKey("authentication.CustomUser", verbose_name=_("User"), on_delete=models.CASCADE)
+
+    class Meta:
+        auto_created=True
+        db_table = "donation_donationlikes"
 
 class Donation(models.Model):
     title = models.CharField(_("Item Name"), max_length=100)
@@ -34,7 +41,8 @@ class Donation(models.Model):
     updated_at = models.DateTimeField(_("Updated At"), auto_now=True)
     active = models.BooleanField(_("Is Active"), default=False)
     slug = models.SlugField(_("Slug"), blank=True, null=False)
-    likes = models.ManyToManyField("authentication.CustomUser", verbose_name=_("Likers"))
+    # likes = models.ManyToManyField("authentication.CustomUser", verbose_name=_("Likers"))
+    likes = models.ManyToManyField("authentication.CustomUser", verbose_name=_("Likers"), through='DonationLikes', related_name="donation_obj")
 
     class Meta:
         verbose_name = _("Donation")

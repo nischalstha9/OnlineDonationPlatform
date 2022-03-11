@@ -3,7 +3,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from donation.models import Category, Donation
+from donation.models import Category, Donation, DonationLikes
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from .serializers import CategorySerializer,DonationSerializer
 from authentication.permissions import IsAdminPermission, IsDontationOwnerOrReadOnlyPermission, ReadOnly, is_user_admin
@@ -67,6 +67,44 @@ class MyDonationListView(ListAPIView):
 
     def get_queryset(self):
         return Donation.objects.filter(user=self.request.user).select_related("category", "user").prefetch_related("likes")
+
+class LikedDonationListView(ListAPIView):
+    serializer_class = DonationSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['donation__category', 'donation__location']
+    search_fields = ['donation__title', 'donation__category__name', 'donation__location']
+    ordering_fields = ['donation__title', 'donation__category__name', 'donation__location', 'donation__created_at', 'donation__updated_at']
+    pagination_class = LimitOffsetPagination
+    queryset = DonationLikes.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        qs = DonationLikes.objects.filter(user=self.request.user).select_related("donation","donation__user","donation__category")
+        queryset = [i.donation for i in qs]
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = DonationSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = DonationSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    # def get(self, request, *args, **kwargs):
+    #     qs = DonationLikes.objects.filter(user=self.request.user).select_related("donation","donation__user","donation__category")
+    #     qs = [i.donation for i in qs]
+    #     paginated_qs = self.paginate_queryset(qs)
+    #     data = DonationSerializer(paginated_qs, many=True).data
+    #     resp = self.get_paginated_response(data)
+    #     return resp
+        # page = self.paginate_queryset(qs)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
+
+        # serializer = self.get_serializer(queryset, many=True)
+        # return Response(serializer.data)
+        
+        
 
 
 class MetaImageListCreateSerializer(ListCreateAPIView):

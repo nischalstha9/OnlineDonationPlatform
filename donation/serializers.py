@@ -1,3 +1,4 @@
+from authentication.serializers import CustomUserSerializer
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 from .models import Donation, Category, MetaImage
@@ -30,6 +31,9 @@ class DonationSerializer(ModelSerializer):
         extra_kwargs = {
             "user":{
                 "required":False
+            },
+            "likes":{
+                "required":False
             }
         }
 
@@ -38,10 +42,7 @@ class DonationSerializer(ModelSerializer):
 
     def get_doner(self, obj):
         user = obj.user
-        return {
-            "name":f"{user.first_name} {user.last_name}",
-            "email":user.email
-        }
+        return CustomUserSerializer(user).data
 
     def validate(self, attrs):
         attrs['user'] = self.context.get('view').request.user
