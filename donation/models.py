@@ -41,8 +41,7 @@ class Donation(models.Model):
     updated_at = models.DateTimeField(_("Updated At"), auto_now=True)
     active = models.BooleanField(_("Is Active"), default=False)
     slug = models.SlugField(_("Slug"), blank=True, null=False)
-    # likes = models.ManyToManyField("authentication.CustomUser", verbose_name=_("Likers"))
-    likes = models.ManyToManyField("authentication.CustomUser", verbose_name=_("Likers"), through='DonationLikes', related_name="donation_obj")
+    likes = models.ManyToManyField("authentication.CustomUser", verbose_name=_("Likers"), through='DonationLikes', related_name="donation_obj", blank=True)
 
     class Meta:
         verbose_name = _("Donation")

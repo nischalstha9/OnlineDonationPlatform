@@ -11,7 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import status
 from authentication.models import Customer
-from django.db.models import Count
+from django.db.models import Count, Q
 
 # Create your views here
 class CategoryListCreateAPIView(ListCreateAPIView):
@@ -113,15 +113,20 @@ class MetaImageListCreateSerializer(ListCreateAPIView):
 class HomePageMeta(APIView):
     def get(self, request, *args, **kwargs):
         top_doners = Customer.objects.values('id', "first_name","last_name","email").annotate(num_donations=Count('donations')).order_by('-num_donations')[:10]
-        all_categories = Category.objects.values("id","name","parent")
-        top_categories = all_categories.annotate(num_donations = Count("donations")).order_by('-num_donations')[:10]
+        all_categories_qs = Category.objects.all().annotate(num_donations = Count("donations")).order_by("id")
+        all_categories = CategorySerializer(all_categories_qs, many=True).data
+        # top_categories_qs = all_categories_qs.order_by('-num_donations')[:10]
+        # top_categories = CategorySerializer(top_categories_qs, many=True).data
         total_donations = Donation.objects.count()
         total_active_donations = Donation.objects.filter(active=True).count()
         donations_24 = Donation.objects.filter(created_at__gte=datetime.now().astimezone()-timedelta(hours=24)).values("id","title")
+        most_liked_donations_qs = Donation.objects.filter(active=True).annotate(num_likes=Count("likes")).order_by("-num_likes")[:5]
+        most_liked_donations = DonationSerializer(most_liked_donations_qs, many=True).data
         data = {
             "top_doners":top_doners,
             "all_categories": all_categories,
-            "top_categories":top_categories,
+            # "top_categories":top_categories,
+            "most_liked_donations":most_liked_donations,
             "total_donations":total_donations,
             "total_active_donations":total_active_donations,
             "donations_24":donations_24,
@@ -142,3 +147,26 @@ class DonationLikeToggleView(APIView):
         else:
             donation.likes.add(self.request.user)
         return Response({"liked":not liked}, status = status.HTTP_202_ACCEPTED)
+
+class RelatedDonationListAPIView(ListAPIView):
+    serializer_class = DonationSerializer
+    # filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    # filterset_fields = ['category', 'location', 'active', 'user']
+    # search_fields = ['title', 'category__name', 'location']
+    # ordering_fields = ['title', 'category__name', 'location', 'created_at', 'updated_at']
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        try:
+            help_id = self.request.GET.get('help_id')
+            help_obj = Donation.objects.get(id=help_id)
+            category = help_obj.category
+            location = help_obj.location[:5]
+            user = help_obj.user
+            updated_at = help_obj.updated_at
+            date_start_range = updated_at-timedelta(days=3)
+            date_end_range = updated_at+timedelta(days=3)
+            qs = Donation.objects.exclude(id=help_id).filter(active=True).filter(Q(category=category)|Q(location__startswith=location)|Q(user=user)|Q(updated_at__gte=date_start_range)|Q(updated_at__lte=date_end_range)).select_related("category", "user").prefetch_related("likes")[:6]
+            return qs
+        except Exception:
+            return Donation.objects.none()

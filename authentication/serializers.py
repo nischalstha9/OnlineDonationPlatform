@@ -123,7 +123,7 @@ class CommonUserSerializerMixin(serializers.Serializer):
         return obj.get_gender_display()
 
     def get_avatar_path(self, obj):
-        return f"{settings.ADMIN_URL}{settings.MEDIA_URL}{obj.avatar}"
+        return f"{settings.MEDIA_URL}{obj.avatar}"
 
 class CustomUserSerializer(serializers.ModelSerializer, CommonUserSerializerMixin):
     class Meta:

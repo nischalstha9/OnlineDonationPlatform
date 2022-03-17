@@ -88,7 +88,9 @@ class BlacklistView(APIView):
             resp.delete_cookie(settings.SIMPLE_JWT.get('REFRESH_COOKIE_NAME'))
             return resp
         except Exception as e:
+            print(e)
             resp = Response(status=status.HTTP_400_BAD_REQUEST)
+        return resp
 
 
 class UserListView(ListAPIView):
