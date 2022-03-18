@@ -166,7 +166,7 @@ class RelatedDonationListAPIView(ListAPIView):
             updated_at = help_obj.updated_at
             date_start_range = updated_at-timedelta(days=3)
             date_end_range = updated_at+timedelta(days=3)
-            qs = Donation.objects.exclude(id=help_id).filter(active=True).filter(Q(category=category)|Q(location__startswith=location)|Q(user=user)|Q(updated_at__gte=date_start_range)|Q(updated_at__lte=date_end_range)).select_related("category", "user").prefetch_related("likes")[:6]
+            qs = Donation.objects.exclude(id=help_id).filter(active=True).filter(Q(category=category)|Q(location__startswith=location)|Q(user=user)|Q(updated_at__gte=date_start_range)|Q(updated_at__lte=date_end_range)).select_related("category", "user").prefetch_related("likes").distinct()[:6]
             return qs
         except Exception:
             return Donation.objects.none()

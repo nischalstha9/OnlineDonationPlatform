@@ -3,7 +3,7 @@ from authentication.serializers import MyTokenObtainPairSerializer, CustomUserSe
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from authentication.models import CustomUser, UserToken, Customer
-from authentication.permissions import IsAdminPermission, is_user_admin
+from authentication.permissions import IsAdminPermission, is_user_admin, is_user_customer
 from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework import filters
@@ -15,7 +15,6 @@ from django.template.loader import render_to_string
 from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
 from django.conf import settings
 from rest_framework_simplejwt.views import TokenRefreshView
-from django.contrib.auth.password_validation import validate_password
 
 
 def get_user_verification(data):
@@ -123,10 +122,14 @@ class UserView(APIView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            # try:
             instance = request.user
+            serializer = self.get_serializer_class()
+            if is_user_customer(request):
+                try:
+                    instance = Customer.objects.get(id=instance.id)
+                except:
+                    pass
             if instance is not None:
-                serializer = self.get_serializer_class()
                 serializer = serializer(instance)
                 return Response(serializer.data)
             else:
@@ -137,21 +140,25 @@ class UserView(APIView):
 
     def patch(self, request, format=None):
         if request.user.is_authenticated:
-            qs = self.get_queryset()
-            instance = qs.filter(pk=request.user.id).last()
+            instance = request.user
+            if is_user_customer(request):
+                try:
+                    instance = Customer.objects.get(id=instance.id)
+                except:
+                    pass
             serializer = self.get_serializer_class()
             serializer = serializer(instance, data=request.data, partial=True)
             if serializer.is_valid():
-                serializer.save()
+                obj = serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"detail":"Unauthorized User"}, status=status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request):
-        if is_user_admin(request):
-            user = request.user
-            user.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        # if is_user_admin(request):
+        #     user = request.user
+        #     user.delete()
+        #     return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({"detail":"Forbidden!"}, status=status.HTTP_403_FORBIDDEN)
 
     def post(self, request, format='json'):
