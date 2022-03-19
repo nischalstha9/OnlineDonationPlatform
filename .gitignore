@@ -3,4 +3,11 @@
 */migrations/
 dump.rdb
 media/*
+static/
+DockerData/
+static/*
 !media/default/
+
+pgenv.txt
+env.txt
+./DockerData
