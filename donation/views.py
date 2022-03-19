@@ -78,9 +78,14 @@ class LikedDonationListView(ListAPIView):
     pagination_class = LimitOffsetPagination
     queryset = DonationLikes.objects.all()
 
-    def list(self, request, *args, **kwargs):
+    def get_queryset(self):
         qs = DonationLikes.objects.filter(user=self.request.user).select_related("donation","donation__user","donation__category")
-        queryset = [i.donation for i in qs]
+        return qs
+    
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = [i.donation for i in queryset]
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = DonationSerializer(page, many=True)
@@ -164,9 +169,16 @@ class RelatedDonationListAPIView(ListAPIView):
             location = help_obj.location[:5]
             user = help_obj.user
             updated_at = help_obj.updated_at
-            date_start_range = updated_at-timedelta(days=3)
-            date_end_range = updated_at+timedelta(days=3)
-            qs = Donation.objects.exclude(id=help_id).filter(active=True).filter(Q(category=category)|Q(location__startswith=location)|Q(user=user)|Q(updated_at__gte=date_start_range)|Q(updated_at__lte=date_end_range)).select_related("category", "user").prefetch_related("likes").distinct()[:6]
+            date_start_range = updated_at-timedelta(days=2)
+            date_end_range = updated_at+timedelta(days=2)
+            qs = Donation.objects.exclude(id=help_id).filter(active=True) \
+                .filter(
+                    Q(category=category)|
+                    Q(location__startswith=location)|
+                    Q(user=user)|
+                    Q(updated_at__gte=date_start_range)|
+                    Q(updated_at__lte=date_end_range)) \
+                    .select_related("category", "user").prefetch_related("likes").distinct()[:9]
             return qs
         except Exception:
             return Donation.objects.none()

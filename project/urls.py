@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('authentication.urls'), name="AuthenticationAPI"),
     path('api/v1/donation/', include('donation.urls'),name="DonationAPI"),
+    path('api/v1/carousel/', include('carousel.urls'),name="CarouselAPI"),
     path('swagger/', schema_view, name="SwaggerView"),
     path('__debug__/', include('debug_toolbar.urls')),
     # path('auth/registration/', include('dj_rest_auth.registration.urls'))
