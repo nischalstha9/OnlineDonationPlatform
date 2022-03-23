@@ -28,7 +28,6 @@ urlpatterns = [
     path('api/v1/carousel/', include('carousel.urls'),name="CarouselAPI"),
     path('swagger/', schema_view, name="SwaggerView"),
     path('__debug__/', include('debug_toolbar.urls')),
-    # path('auth/registration/', include('dj_rest_auth.registration.urls'))
 ]
 
 if settings.DEBUG:

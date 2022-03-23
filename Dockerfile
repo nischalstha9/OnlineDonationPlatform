@@ -9,7 +9,6 @@ WORKDIR /code
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
-RUN ls -lh
-RUN chmod 777 /code/docker-entrypoint.sh
-ENTRYPOINT /code/docker-entrypoint.sh
+RUN chmod 755 /code/docker-entrypoint.sh
+RUN chmod 755 /code/celery.sh
 # RUN sh ./docker-entrypoint.sh

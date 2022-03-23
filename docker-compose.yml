@@ -19,6 +19,7 @@ services:
             - env.txt
         depends_on:
             - db
+        command: sh /code/docker-entrypoint.sh
 
     redis:
         image: redis:6.2-alpine
