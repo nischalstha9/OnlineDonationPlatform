@@ -23,5 +23,5 @@ class DonationAdmin(admin.ModelAdmin):
     save_as= True
 admin.site.register(Donation, DonationAdmin)
 
-admin.site.register(DonationLikes)
+# admin.site.register(DonationLikes)
 
