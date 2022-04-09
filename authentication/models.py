@@ -36,19 +36,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         help_text=_('Designates whether the user can log into this admin site.'),
     )
     is_active = models.BooleanField(
-        _('active'),
+        _('Is Active'),
         default=True,
         help_text=_(
             'Designates whether this user should be treated as active. '
             'Unselect this instead of deleting accounts.'
         ),
     )
-    email_verified = models.BooleanField(default=False, verbose_name='Email Verified')
-    date_joined = models.DateTimeField(default=timezone.now)
-    gender = models.CharField(choices=GENDER_CHOICES, max_length=1, default=GENDER_CHOICES[3][0])
-    phone = models.CharField(max_length=15, null=True, blank=True)
-    role = models.IntegerField(blank=True, default=ROLE_CHOICES[1][0], choices=ROLE_CHOICES)
-    avatar = models.ImageField(upload_to='profile/avatar/', default=DEFAULT_AVATAR, blank=True)
+    email_verified = models.BooleanField(_("Is Email Verified"),default=False)
+    date_joined = models.DateTimeField(_("Date Joined"),default=timezone.now)
+    gender = models.CharField(_("Gender"),choices=GENDER_CHOICES, max_length=1, default=GENDER_CHOICES[3][0])
+    phone = models.CharField(_("Phone"),max_length=15, null=True, blank=True)
+    role = models.IntegerField(_("Role"),blank=True, default=ROLE_CHOICES[1][0], choices=ROLE_CHOICES)
+    avatar = models.ImageField(_("Avatar Image"),upload_to='profile/avatar/', default=DEFAULT_AVATAR, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -95,7 +95,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Customer(CustomUser):
     objects = CustomerManager()
-    dob = models.DateField(blank=True, null=True)
+    dob = models.DateField(_('Date of birth'),blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Customers"

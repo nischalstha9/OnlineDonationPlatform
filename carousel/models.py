@@ -18,7 +18,7 @@ class Carousel(models.Model):
 class CarouselImage(models.Model):
     carousel = models.ForeignKey("carousel.Carousel", verbose_name=_("Carousel"), on_delete=models.CASCADE, related_name="carousel_images")
     image = models.ImageField(_("Image"), upload_to="carousel/", blank=True, null=False)
-    caption = models.CharField(_("Caption"), max_length=50)    
+    caption = models.CharField(_("Caption"), max_length=50)
 
     class Meta:
         verbose_name = _("CarouselImage")

@@ -301,9 +301,9 @@ class ForgetPasswordAPIView(APIView):
                     tokenSerializer = UserTokenSerializer(data=data)
                     if(tokenSerializer.is_valid(raise_exception=True)):
                         UserToken.objects.create(**tokenSerializer.validated_data)
-                    return Response({"detail": f"Password reset email sent to {data['email']}"}, status.HTTP_200_OK)
+                    return Response({"detail": "Password reset email sent!"}, status.HTTP_200_OK)
                 else:
-                    return Response({"detail": "Problem in sending email"}, status.HTTP_400_BAD_REQUEST)
+                    return Response({"detail": "Problem in sending email!"}, status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({"email": "This field is required"}, status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
