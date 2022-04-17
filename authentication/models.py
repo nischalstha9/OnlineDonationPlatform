@@ -48,7 +48,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(_("Gender"),choices=GENDER_CHOICES, max_length=1, default=GENDER_CHOICES[3][0])
     phone = models.CharField(_("Phone"),max_length=15, null=True, blank=True)
     role = models.IntegerField(_("Role"),blank=True, default=ROLE_CHOICES[1][0], choices=ROLE_CHOICES)
-    avatar = models.ImageField(_("Avatar Image"),upload_to='profile/avatar/', default=DEFAULT_AVATAR, blank=True)
+    avatar = models.ImageField(_("Avatar Image"),upload_to='profile/avatar/', blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -80,12 +80,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             self.is_superuser = False
         super(CustomUser,self).save(*args, **kwargs)
 
-        img = Image.open(self.avatar.path)
+        if self.avatar:
+            img = Image.open(self.avatar.path)
 
-        if img.height > 600 or img.width > 600:
-            output_size = (600, 600)
-            img.thumbnail(output_size)
-            img.save(self.avatar.path)
+            if img.height > 600 or img.width > 600:
+                output_size = (600, 600)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
 
     def delete(self):
         img_file = self.avatar

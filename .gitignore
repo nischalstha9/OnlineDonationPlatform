@@ -11,3 +11,5 @@ static/*
 pgenv.txt
 env.txt
 ./DockerData
+
+*.pgerd
