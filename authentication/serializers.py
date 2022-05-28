@@ -160,18 +160,18 @@ class CustomUserSerializer(serializers.ModelSerializer, CommonUserSerializerMixi
         if password is not None:
             instance.set_password(password)
         instance.save()
-        from django.conf import settings
-        request = self.context.get('request')
-        assets_image_path = str(request.build_absolute_uri(
-            settings.MEDIA_URL + DEFAULT_ASSETS_IMAGES_PATH))
-        domain = ADMIN_DOMAIN
-        try:
-            send_register_mail(instance, domain, assets_image_path,
-                               UserTokenSerializer, 'register-confirm-admin.html')
-        except Exception:
-            instance.delete()
-            raise serializers.ValidationError(
-                {"detail": "Error in creating token"})
+        if settings.SEND_EMAIL_VALIDATION_EMAIL:
+            request = self.context.get('request')
+            assets_image_path = str(request.build_absolute_uri(
+                settings.MEDIA_URL + DEFAULT_ASSETS_IMAGES_PATH))
+            domain = ADMIN_DOMAIN
+            try:
+                send_register_mail(instance, domain, assets_image_path,
+                                UserTokenSerializer, 'register-confirm-admin.html')
+            except Exception:
+                instance.delete()
+                raise serializers.ValidationError(
+                    {"detail": "Error in creating token"})
         return instance
 
     def update(self, instance, validated_data):
@@ -226,17 +226,17 @@ class CustomerSerializer(serializers.ModelSerializer, CommonUserSerializerMixin)
         if validate_password(password)==None:
             instance.set_password(password)
         instance.save()
-        try:
-            from django.conf import settings
-            request = self.context.get('request')
-            assets_image_path = str(request.build_absolute_uri(
-                settings.MEDIA_URL + DEFAULT_ASSETS_IMAGES_PATH))
-            domain = CLIENT_DOMAIN
-            send_register_mail(instance, domain, assets_image_path, UserTokenSerializer, 'register-confirm-admin.html')
-        except Exception:
-            instance.delete()
-            raise serializers.ValidationError(
-                {"detail": "Error in creating token"})
+        if settings.SEND_EMAIL_VALIDATION_EMAIL:
+            try:
+                request = self.context.get('request')
+                assets_image_path = str(request.build_absolute_uri(
+                    settings.MEDIA_URL + DEFAULT_ASSETS_IMAGES_PATH))
+                domain = CLIENT_DOMAIN
+                send_register_mail(instance, domain, assets_image_path, UserTokenSerializer, 'register-confirm-admin.html')
+            except Exception:
+                instance.delete()
+                raise serializers.ValidationError(
+                    {"detail": "Error in creating token"})
         return instance
 
     def update(self, instance, validated_data):

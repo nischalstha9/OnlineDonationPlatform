@@ -27,17 +27,29 @@ class CategoryListCreateAPIView(ListCreateAPIView):
 class DonationListCreateAPIView(ListCreateAPIView):
     serializer_class = DonationSerializer
     permission_classes = [IsAuthenticated|ReadOnly]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+        ]
     filterset_fields = ['category', 'location', 'active', 'user']
     search_fields = ['title', 'category__name', 'location']
-    ordering_fields = ['title', 'category__name', 'location', 'created_at', 'updated_at']
+    ordering_fields = [
+        'title',
+        'category__name',
+        'location',
+        'created_at',
+        'updated_at'
+        ]
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         if(self.request.query_params.get('active')):
             if is_user_admin(self.request):
-                return Donation.objects.all().prefetch_related("likes").select_related("category", "user")
-        return Donation.objects.filter(active=True).prefetch_related("likes").select_related("category", "user")
+                return Donation.objects.all()\
+                .prefetch_related("likes").select_related("category", "user")
+        return Donation.objects.filter(active=True)\
+        .prefetch_related("likes").select_related("category", "user")
 
 class DonationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = DonationSerializer
@@ -79,7 +91,7 @@ class LikedDonationListView(ListAPIView):
     queryset = DonationLikes.objects.all()
 
     def get_queryset(self):
-        qs = DonationLikes.objects.filter(user=self.request.user).select_related("donation","donation__user","donation__category")
+        qs = DonationLikes.objects.filter(user=self.request.user).order_by("-id").select_related("donation","donation__user","donation__category")
         return qs
     
 
@@ -169,16 +181,20 @@ class RelatedDonationListAPIView(ListAPIView):
             location = help_obj.location[:5]
             user = help_obj.user
             updated_at = help_obj.updated_at
-            date_start_range = updated_at-timedelta(days=2)
-            date_end_range = updated_at+timedelta(days=2)
+            date_start_range = updated_at-timedelta(days=1)
+            date_end_range = updated_at+timedelta(days=1)
             qs = Donation.objects.exclude(id=help_id).filter(active=True) \
                 .filter(
                     Q(category=category)|
-                    Q(location__startswith=location)|
-                    Q(user=user)|
-                    Q(updated_at__gte=date_start_range)|
-                    Q(updated_at__lte=date_end_range)) \
-                    .select_related("category", "user").prefetch_related("likes").distinct()[:9]
-            return qs
+                    Q(location__icontains=location)|
+                    Q(user=user)
+                    ).select_related("category", "user").prefetch_related("likes").distinct()
+            # if qs.count() < 1:
+            #     new_qs = Donation.objects.exclude(id=help_id).filter(active=True).filter(
+            #         Q(updated_at__gte=date_start_range)|
+            #         Q(updated_at__lte=date_end_range)
+            #     ).select_related("category", "user").prefetch_related("likes").distinct()
+            #     qs = qs.union(new_qs)
+            return qs[:9]
         except Exception:
             return Donation.objects.none()

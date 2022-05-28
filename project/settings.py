@@ -71,10 +71,8 @@ MIDDLEWARE = [
 ]
 
 INTERNAL_IPS = [
-    # ...
     "127.0.0.1",
     "localhost",
-    # ...
 ]
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:8000",
@@ -235,3 +233,5 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+SEND_EMAIL_VALIDATION_EMAIL=os.environ.get("SEND_EMAIL_VALIDATION_EMAIL")=="1"

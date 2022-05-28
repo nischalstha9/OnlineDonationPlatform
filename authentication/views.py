@@ -174,7 +174,8 @@ class UserView(APIView):
         except serializers.ValidationError as err:
             return Response(err.detail, status=status.HTTP_400_BAD_REQUEST)
         except Exception as exe:
-            return Response({"detail": "Error creating user", "error": exe}, status=status.HTTP_400_BAD_REQUEST)
+            print(exe)
+            return Response({"detail": "Error creating user"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordChangeAPIView(APIView):
