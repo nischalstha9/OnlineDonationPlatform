@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view, permission_classes
 from authentication.utils import RandomStringTokenGenerator
 from authentication.constants import DEFAULT_ASSETS_IMAGES_PATH, ADMIN_DOMAIN, CLIENT_DOMAIN
 from django.template.loader import render_to_string
-from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView,RetrieveAPIView
 from django.conf import settings
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -377,3 +377,12 @@ class ForgetPasswordAPIView(APIView):
 #     serializer_class = CustomerSerializer
 
 
+class DonerProfileInfoView(RetrieveAPIView):
+    lookup_field = "id"
+    lookup_url_kwarg = "user_id"
+
+    def get_queryset(self):
+        return CustomUser.objects.all()
+
+    def get_serializer_class(self):
+        return CustomUserSerializer

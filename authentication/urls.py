@@ -1,6 +1,7 @@
 from django.urls import path
 # from rest_framework_simplejwt import views as jwt_views
 from .views import (
+    DonerProfileInfoView,
     UserView,
     UserDetailView,
     UserListView,
@@ -32,6 +33,7 @@ urlpatterns = [
     path('user/activate/', activateAccount , name='user-activate'),
     path('user/password/reset/', resetPassword , name='user-reset'),
     path('user/password/forget/', ForgetPasswordAPIView.as_view(), name='user-forget-password'),
+    path('doner/info/<int:user_id>', DonerProfileInfoView.as_view(), name='doner-profile-info'),
     # path('customer/', CustomerCRUView.as_view(), name="customer"),
     # path('customer/all/', CustomerListView.as_view(),name="all-customer"),
     # path('customer/<int:pk>/', CustomerDetailView.as_view(),name="customer-detail"),

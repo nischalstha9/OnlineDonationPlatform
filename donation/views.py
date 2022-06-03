@@ -68,17 +68,25 @@ class DonationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         serializer = DonationSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class MyDonationListView(ListAPIView):
+class UserDonationListView(ListAPIView):
     serializer_class = DonationSerializer
-    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['category', 'location', 'active']
+    filterset_fields = ['category', 'location']
     search_fields = ['title', 'category__name', 'location']
     ordering_fields = ['title', 'category__name', 'location', 'created_at', 'updated_at']
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
+        user_id = self.kwargs.get("user_id")
+        return Donation.objects.filter(user__id=user_id, active=True).select_related("category", "user").prefetch_related("likes")
+
+class MyDonationListView(UserDonationListView):
+    permission_classes = [IsAuthenticated]
+    filterset_fields = ['category', 'location', 'active']
+
+    def get_queryset(self):
         return Donation.objects.filter(user=self.request.user).select_related("category", "user").prefetch_related("likes")
+
 
 class LikedDonationListView(ListAPIView):
     serializer_class = DonationSerializer
