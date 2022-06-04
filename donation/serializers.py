@@ -48,6 +48,7 @@ class DonationSerializer(ModelSerializer):
         attrs['user'] = self.context.get('view').request.user
         return super().validate(attrs)
 
+
 class MetaImageListCreateSerializer(ModelSerializer):
     class Meta:
         model = MetaImage

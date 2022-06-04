@@ -131,24 +131,22 @@ class LikedDonationListView(ListAPIView):
 
 class HomePageMeta(APIView):
     def get(self, request, *args, **kwargs):
-        top_doners = Customer.objects.values('id', "first_name","last_name","email").annotate(num_donations=Count('donations')).order_by('-num_donations')[:10]
+        # top_doners = Customer.objects.values('id', "first_name","last_name","email").annotate(num_donations=Count('donations')).order_by('-num_donations')[:10]
         all_categories_qs = Category.objects.all().annotate(num_donations = Count("donations")).order_by("id")
         all_categories = CategorySerializer(all_categories_qs, many=True).data
-        # top_categories_qs = all_categories_qs.order_by('-num_donations')[:10]
-        # top_categories = CategorySerializer(top_categories_qs, many=True).data
-        total_donations = Donation.objects.count()
-        total_active_donations = Donation.objects.filter(active=True).count()
-        donations_24 = Donation.objects.filter(created_at__gte=datetime.now().astimezone()-timedelta(hours=24)).values("id","title")
-        most_liked_donations_qs = Donation.objects.filter(active=True).annotate(num_likes=Count("likes")).order_by("-num_likes")[:5]
-        most_liked_donations = DonationSerializer(most_liked_donations_qs, many=True).data
+        # total_donations = Donation.objects.count()
+        # total_active_donations = Donation.objects.filter(active=True).count()
+        # donations_24 = Donation.objects.filter(created_at__gte=datetime.now().astimezone()-timedelta(hours=24)).values("id","title")
+        most_liked_donations_qs = Donation.objects.filter(active=True).annotate(num_likes=Count("likes")).order_by("-num_likes").select_related("user").prefetch_related("likes").values("id","title","slug","num_likes","updated_at","user__first_name","user__last_name","user__avatar")[:5]
+        # most_liked_donations = DonationSerializer(most_liked_donations_qs, many=True).data
         data = {
-            "top_doners":top_doners,
+            # "top_doners":top_doners,
             "all_categories": all_categories,
             # "top_categories":top_categories,
-            "most_liked_donations":most_liked_donations,
-            "total_donations":total_donations,
-            "total_active_donations":total_active_donations,
-            "donations_24":donations_24,
+            "most_liked_donations":most_liked_donations_qs,
+            # "total_donations":total_donations,
+            # "total_active_donations":total_active_donations,
+            # "donations_24":donations_24,
             }
         return Response(data,status=200)
     
@@ -182,9 +180,9 @@ class RelatedDonationListAPIView(ListAPIView):
             category = help_obj.category
             location = help_obj.location[:5]
             user = help_obj.user
-            updated_at = help_obj.updated_at
-            date_start_range = updated_at-timedelta(days=1)
-            date_end_range = updated_at+timedelta(days=1)
+            # updated_at = help_obj.updated_at
+            # date_start_range = updated_at-timedelta(days=1)
+            # date_end_range = updated_at+timedelta(days=1)
             qs = Donation.objects.exclude(id=help_id).filter(active=True) \
                 .filter(
                     Q(category=category)|

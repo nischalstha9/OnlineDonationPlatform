@@ -227,3 +227,9 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
 SEND_EMAIL_VALIDATION_EMAIL=os.environ.get("SEND_EMAIL_VALIDATION_EMAIL")=="1"
+
+def show_toolbar(request):
+    return DEBUG
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
+}
