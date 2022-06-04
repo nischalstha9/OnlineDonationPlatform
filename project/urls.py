@@ -24,6 +24,7 @@ schema_view = get_swagger_view(title='Donation Platform API')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("api-auth/", include("rest_framework.urls")),
     path('api/v1/auth/', include('authentication.urls'), name="AuthenticationAPI"),
     path('api/v1/donation/', include('donation.urls'),name="DonationAPI"),
     path('api/v1/carousel/', include('carousel.urls'),name="CarouselAPI"),

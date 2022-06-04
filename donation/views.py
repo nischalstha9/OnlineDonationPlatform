@@ -3,9 +3,9 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from donation.models import Category, Donation, DonationLikes
+from donation.models import Category, Donation, DonationLikes, MetaImage
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .serializers import CategorySerializer,DonationSerializer
+from .serializers import CategorySerializer,DonationSerializer, MetaImageListCreateSerializer
 from authentication.permissions import IsAdminPermission, IsDontationOwnerOrReadOnlyPermission, ReadOnly, is_user_admin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -92,27 +92,27 @@ class LikedDonationListView(ListAPIView):
     serializer_class = DonationSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['donation__category', 'donation__location']
-    search_fields = ['donation__title', 'donation__category__name', 'donation__location']
-    ordering_fields = ['donation__title', 'donation__category__name', 'donation__location', 'donation__created_at', 'donation__updated_at']
+    filterset_fields = ['category', 'location']
+    search_fields = ['title', 'category__name', 'location']
+    ordering_fields = ['title', 'category__name', 'location', 'created_at', 'updated_at']
     pagination_class = LimitOffsetPagination
     queryset = DonationLikes.objects.all()
 
     def get_queryset(self):
-        qs = DonationLikes.objects.filter(user=self.request.user).order_by("-id").select_related("donation","donation__user","donation__category")
+        qs = Donation.objects.filter(likes=self.request.user).order_by("-donationlikes__created_at").select_related("user","category")
         return qs
     
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = [i.donation for i in queryset]
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = DonationSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     # queryset = [i.donation for i in queryset]
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = DonationSerializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
 
-        serializer = DonationSerializer(queryset, many=True)
-        return Response(serializer.data)
+    #     serializer = DonationSerializer(queryset, many=True)
+    #     return Response(serializer.data)
     
     # def get(self, request, *args, **kwargs):
     #     qs = DonationLikes.objects.filter(user=self.request.user).select_related("donation","donation__user","donation__category")
@@ -129,11 +129,6 @@ class LikedDonationListView(ListAPIView):
         # serializer = self.get_serializer(queryset, many=True)
         # return Response(serializer.data)
         
-        
-
-
-class MetaImageListCreateSerializer(ListCreateAPIView):
-    pass
 
 class HomePageMeta(APIView):
     def get(self, request, *args, **kwargs):
@@ -206,3 +201,15 @@ class RelatedDonationListAPIView(ListAPIView):
             return qs[:9]
         except Exception:
             return Donation.objects.none()
+
+class MetaImageListCreateAPIView(ListCreateAPIView):
+    serializer_class = MetaImageListCreateSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['user','created_at']
+    search_fields = ['text']
+    ordering_fields = ['text', 'id','created_at']
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        return MetaImage.objects.filter(user=self.request.user)

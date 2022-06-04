@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CategoryListCreateAPIView, DonationLikeToggleView, DonationListCreateAPIView, DonationRetrieveUpdateDestroyAPIView, HomePageMeta, LikedDonationListView, UserDonationListView, MyDonationListView,RelatedDonationListAPIView
+from .views import CategoryListCreateAPIView, DonationLikeToggleView, DonationListCreateAPIView, DonationRetrieveUpdateDestroyAPIView, HomePageMeta, LikedDonationListView, MetaImageListCreateAPIView, UserDonationListView, MyDonationListView,RelatedDonationListAPIView
 
 urlpatterns = [
     path('category/', CategoryListCreateAPIView.as_view(), name="CategoryListCreateAPIView"),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('liked-donations/', LikedDonationListView.as_view(), name="LikedDonationListAPIView"),
     path('home-meta/', HomePageMeta.as_view(), name="HomepageMeta"),
     path('get-related-helps/', RelatedDonationListAPIView.as_view(), name="GetRelatedHelps"),
+    path('meta-image/', MetaImageListCreateAPIView.as_view(), name="MetaImageListCreateAPIView"),
 ]
