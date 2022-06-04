@@ -34,6 +34,7 @@ class DonationLikes(models.Model):
     class Meta:
         auto_created=True
         db_table = "donation_donationlikes"
+        verbose_name_plural="Donation Likes"
 
 class Donation(models.Model):
     title = models.CharField(_("Item Name"), max_length=100)
@@ -77,8 +78,8 @@ class MetaImage(models.Model):
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
 
     class Meta:
-        verbose_name = _("MetaImage")
-        verbose_name_plural = _("MetaImages")
+        verbose_name = _("Meta Image")
+        verbose_name_plural = _("Meta Images")
 
     def __str__(self):
         return str(self.id)
