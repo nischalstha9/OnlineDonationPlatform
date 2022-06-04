@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import Category, Donation,MetaImage
+from .models import Category, Donation, DonationLikes,MetaImage
 from rangefilter.filters import DateRangeFilter
 from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
 
 # Register your models here.
 admin.site.register(Category)
+admin.site.register(DonationLikes)
 admin.site.register(MetaImage)
 class DonationAdmin(admin.ModelAdmin):
     list_filter = [

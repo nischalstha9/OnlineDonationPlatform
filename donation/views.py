@@ -91,12 +91,11 @@ class MyDonationListView(UserDonationListView):
 class LikedDonationListView(ListAPIView):
     serializer_class = DonationSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['category', 'location']
     search_fields = ['title', 'category__name', 'location']
-    ordering_fields = ['title', 'category__name', 'location', 'created_at', 'updated_at']
+    # ordering_fields = ['title', 'category__name', 'location', 'created_at', 'updated_at']
     pagination_class = LimitOffsetPagination
-    queryset = DonationLikes.objects.all()
 
     def get_queryset(self):
         qs = Donation.objects.filter(likes=self.request.user).order_by("-donationlikes__created_at").select_related("user","category")

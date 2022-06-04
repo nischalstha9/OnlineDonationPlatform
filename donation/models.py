@@ -29,6 +29,9 @@ class DonationLikes(models.Model):
     user = models.ForeignKey("authentication.CustomUser", verbose_name=_("User"), on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now())
 
+    def __str__(self) -> str:
+        return f"{str(self.created_at)}-{self.user.email} - {self.donation.title}"
+
     class Meta:
         auto_created=True
         db_table = "donation_donationlikes"
