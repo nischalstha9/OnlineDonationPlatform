@@ -98,7 +98,7 @@ class LikedDonationListView(ListAPIView):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        qs = Donation.objects.filter(likes=self.request.user).order_by("-donationlikes__created_at").select_related("user","category")
+        qs = Donation.objects.filter(likes=self.request.user).order_by("-donationlikes__id").select_related("user","category")
         return qs
     
 

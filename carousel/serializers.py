@@ -13,4 +13,4 @@ class CarouselDetailSerializer(ModelSerializer):
         fields = "__all__"
 
     def get_carousel_images(self, obj):
-        return CarouseImageSerializer(obj.carousel_images.all(), many=True).data
+        return CarouseImageSerializer(obj.carousel_images.all().order_by("position"), many=True).data

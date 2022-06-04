@@ -1,5 +1,4 @@
 from PIL import Image
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -27,7 +26,7 @@ class Category(models.Model):
 class DonationLikes(models.Model):
     donation = models.ForeignKey("donation.Donation", verbose_name=_("Donation"), on_delete=models.CASCADE)
     user = models.ForeignKey("authentication.CustomUser", verbose_name=_("User"), on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now())
+    created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
 
     def __str__(self) -> str:
         return f"{str(self.created_at)}-{self.user.email} - {self.donation.title}"

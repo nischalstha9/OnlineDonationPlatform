@@ -19,10 +19,12 @@ class CarouselImage(models.Model):
     carousel = models.ForeignKey("carousel.Carousel", verbose_name=_("Carousel"), on_delete=models.CASCADE, related_name="carousel_images")
     image = models.ImageField(_("Image"), upload_to="carousel/", blank=False, null=False)
     caption = models.CharField(_("Caption"), max_length=50)
+    position = models.IntegerField(_("Position"), null=True, blank=True)
 
     class Meta:
         verbose_name = _("CarouselImage")
         verbose_name_plural = _("CarouselImages")
+        unique_together=[("carousel","position")]
 
     def __str__(self):
         return self.carousel.name
