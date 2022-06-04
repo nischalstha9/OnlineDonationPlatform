@@ -1,17 +1,16 @@
-from datetime import timedelta, datetime
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from donation.models import Category, Donation, DonationLikes, MetaImage
+from donation.models import Category, Donation, MetaImage
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from .serializers import CategorySerializer,DonationSerializer, MetaImageListCreateSerializer
 from authentication.permissions import IsAdminPermission, IsDontationOwnerOrReadOnlyPermission, ReadOnly, is_user_admin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import status
-from authentication.models import Customer
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Case, Value, When
+
 
 # Create your views here
 class CategoryListCreateAPIView(ListCreateAPIView):
@@ -132,7 +131,7 @@ class LikedDonationListView(ListAPIView):
 class HomePageMeta(APIView):
     def get(self, request, *args, **kwargs):
         # top_doners = Customer.objects.values('id', "first_name","last_name","email").annotate(num_donations=Count('donations')).order_by('-num_donations')[:10]
-        all_categories_qs = Category.objects.all().annotate(num_donations = Count("donations")).order_by("id")
+        all_categories_qs = Category.objects.all().select_related("parent").annotate(num_donations = Count("donations",filter=Q(donations__active=True))).order_by("id")
         all_categories = CategorySerializer(all_categories_qs, many=True).data
         # total_donations = Donation.objects.count()
         # total_active_donations = Donation.objects.filter(active=True).count()

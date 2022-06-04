@@ -49,6 +49,7 @@ class DonationSerializer(ModelSerializer):
         return super().validate(attrs)
 
 
+
 class MetaImageListCreateSerializer(ModelSerializer):
     class Meta:
         model = MetaImage
